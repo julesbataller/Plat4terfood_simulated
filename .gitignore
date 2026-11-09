@@ -1,0 +1,103 @@
+# ==============================================================================
+# FICHIER .gitignore DÉDIÉ À LA PUBLICATION PUBLIQUE SUR GITHUB
+# Exclut intégralement les données réelles (data/, www/), les scripts internes
+# d'ingestion API et tous les documents personnels / CVs.
+# Conserve uniquement le code applicatif, les scripts méthodologiques et data_simulees/.
+# ==============================================================================
+
+# 1. Identifiants, clés et secrets
+.Renviron
+.Renviron.*
+.env
+.env.*
+*.env
+*.pem
+*.ppk
+*.key
+*.id_rsa
+
+# 2. Exclusion stricte de TOUTES les données réelles et graphiques réels
+data/
+www/
+app_visu/
+app_shiny_og/
+rapprochement/
+backend_serveur/
+docs/
+
+# 3. Formats de données brutes, exports et documents personnels
+*.sql
+*.sql.gz
+*.tar.gz
+*.zip
+*.7z
+*.parquet
+*.feather
+*.tsv
+*.xlsx
+*.csv
+*.rds
+*.RData
+*.rda
+*.html
+*.pdf
+*.docx
+*.qmd
+*.rmarkdown
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+
+# 4. Exceptions : autoriser uniquement le jeu de données simulées et ses graphiques
+!data_simulees/
+!data_simulees/*.rds
+!data_simulees/*.geojson
+!data_simulees/www/
+!data_simulees/www/*.png
+!data_simulees/www/*.jpg
+data_simulees/*.csv
+
+# 5. Exclure les scripts internes de collecte API et de débogage
+scripts/ingestion_*
+scripts/ingest_*
+scripts/crawl_*
+scripts/fetch_*
+scripts/rattrapage_*
+scripts/*.py
+scripts/*.json
+scripts/temp_*
+scripts/debug_*
+scripts/test_*
+scripts/fix_*
+
+# 6. Répertoires de travail et fichiers temporaires
+scratch/
+archives/
+tests_methodes/
+contexte_socio_eco/
+resultats_modele_mixte/
+cartes_produits/
+cartes_produits_unifies/
+notes_techniques_html/
+rapport/
+notebooks/
+.gemini/
+.agents/
+.Rhistory
+.Rapp.history
+.Ruserdata
+.Rproj.user/
+*.Rproj.user
+*.bak*
+*.log
+*.txt
+anon.R
+fix_*.R
+fix_*.py
+test_*.R
+implementation_plan.md
+desktop.ini
+Thumbs.db
+.DS_Store

@@ -1,0 +1,76 @@
+name: Deploy Shinylive App to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "shinylive-gh-pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install R dependencies and shinylive
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::shinylive
+            local::.
+
+      - name: Export Shiny application to static WebAssembly site
+        shell: Rscript {0}
+        run: |
+          bundle_dir <- "shinylive_bundle"
+          dir.create(bundle_dir, showWarnings = FALSE, recursive = TRUE)
+          dir.create(file.path(bundle_dir, "data_simulees", "www"), showWarnings = FALSE, recursive = TRUE)
+
+          file.copy("app.R", file.path(bundle_dir, "app.R"), overwrite = TRUE)
+          file.copy("DESCRIPTION", file.path(bundle_dir, "DESCRIPTION"), overwrite = TRUE)
+
+          # Copier uniquement les fichiers RDS/GeoJSON de data_simulees reellement lus par app.R
+          unused_rds <- c("modele_mixte_lmer.rds", "df_agg_corrige.rds", "series_par_plateforme.rds")
+          sim_files <- list.files("data_simulees", full.names = TRUE, recursive = FALSE)
+          sim_files <- sim_files[!file.info(sim_files)$isdir & !(basename(sim_files) %in% unused_rds)]
+          file.copy(sim_files, file.path(bundle_dir, "data_simulees"), overwrite = TRUE)
+
+          # Compression xz pour les gros RDS dans le bundle
+          rd_path <- file.path(bundle_dir, "data_simulees", "resultats_departements.rds")
+          if (file.exists(rd_path)) {
+            d <- readRDS(rd_path)
+            saveRDS(d, rd_path, compress = "xz")
+          }
+          gm_path <- file.path(bundle_dir, "data_simulees", "gmm_models.rds")
+          if (file.exists(gm_path)) {
+            gm <- readRDS(gm_path)
+            saveRDS(gm, gm_path, compress = "xz")
+          }
+
+          # Copie des visuels necessaires sans doublons
+          unused_png <- c("residus_vs_fitted.png")
+          www_files <- list.files("data_simulees/www", full.names = TRUE)
+          www_files <- www_files[!(basename(www_files) %in% unused_png)]
+          file.copy(www_files, file.path(bundle_dir, "data_simulees", "www"), overwrite = TRUE)
+
+          shinylive::export(appdir = bundle_dir, destdir = "_site")
+          file.create("_site/.nojekyll")
+
+      - name: Deploy static site to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          force_orphan: true
