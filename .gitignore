@@ -24,6 +24,16 @@ app_shiny_og/
 rapprochement/
 backend_serveur/
 docs/
+pricco/
+cartes_produits/
+contexte_socio_eco/
+notebooks/
+notes_techniques_html/
+rapport/
+resultats_modele_mixte/
+tests_methodes/
+scratch/
+archives/
 
 # 3. Formats de données brutes, exports et documents personnels
 *.sql

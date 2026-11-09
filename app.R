@@ -594,9 +594,10 @@ produits_choices <- if (!is.null(df_foodon_ref)) {
 # Groupement hiérarchique par rayon/famille pour les menus déroulants
 produits_choices_grouped <- if (!is.null(df_foodon_ref)) {
   sorted_ref <- df_foodon_ref %>% arrange(groupe, categorie_standard)
-  split(sorted_ref$categorie_standard, sorted_ref$groupe)
+  prod_list <- split(sorted_ref$categorie_standard, sorted_ref$groupe)
+  c(list("Indice Territorial Global" = c("Indice des Prix Territoriaux (IPT)" = "Indice Français des Prix en Circuits Courts")), prod_list)
 } else {
-  produits_choices
+  c("Indice des Prix Territoriaux (IPT)" = "Indice Français des Prix en Circuits Courts", produits_choices)
 }
 
 # Liste des années disponibles extraite dynamiquement sans charger les données territoriales lourdes
@@ -645,7 +646,7 @@ ui_footer <- tags$footer(
            tags$ul(style = "list-style: none; padding: 0; margin: 0; line-height: 1.8;",
              tags$li("• Ontologie FoodOn"),
              tags$li("• Contours administratifs IGN / INSEE"),
-             tags$li(tags$a(href = "https://github.com/julesbataller/priscope-demo", target = "_blank", "• Code source & documentation GitHub"))
+             tags$li(tags$a(href = "https://github.com/julesbataller/Priscope", target = "_blank", "• Code source & documentation GitHub"))
            )
     )
   )
@@ -706,10 +707,142 @@ ui <- page_navbar(
       .card-overflow-visible .card-body {
         overflow: visible !important;
       }
+      
+      /* ========================================================= */
+      /* RESPONSIVE DESIGN POUR MOBILES ET TABLETTES               */
+      /* ========================================================= */
+      @media (max-width: 768px) {
+        /* 1. Passer toutes les grilles bslib (layout_columns & layout_column_wrap) en colonne unique */
+        .bslib-grid, 
+        .grid, 
+        .bslib-layout-columns, 
+        .bslib-column-wrap {
+          display: flex !important;
+          flex-direction: column !important;
+          width: 100% !important;
+          gap: 12px !important;
+        }
+        .bslib-grid > *, 
+        .grid > *, 
+        .bslib-layout-columns > *, 
+        .bslib-column-wrap > * {
+          width: 100% !important;
+          max-width: 100% !important;
+          grid-column: span 12 / span 12 !important;
+          flex: 1 1 100% !important;
+        }
+
+        /* 2. Cartes : annulation de la hauteur fixe bloquante et marges fluides */
+        .container-fluid {
+          padding-left: 8px !important;
+          padding-right: 8px !important;
+        }
+        .card {
+          margin-bottom: 12px !important;
+        }
+        .card[style*='height: 750px'], 
+        .card[style*='height:750px'],
+        .card[style*='height: 650px'],
+        .card[style*='height:650px'] {
+          height: auto !important;
+          min-height: 440px !important;
+        }
+        .card-body {
+          padding: 12px !important;
+        }
+
+        /* 3. Cartes interactives ggiraph : eviter le piege tactile de defilement */
+        .html-widget.ggiraph, 
+        .girafe-container {
+          height: auto !important;
+          min-height: 380px !important;
+          touch-action: pan-y !important;
+        }
+        .html-widget.ggiraph svg {
+          width: 100% !important;
+          height: auto !important;
+          max-height: 480px !important;
+        }
+
+        /* 4. Value Boxes / KPI d'accueil */
+        .bslib-value-box {
+          min-height: 85px !important;
+          padding: 12px 14px !important;
+        }
+        .bslib-value-box .value-box-value {
+          font-size: 1.55rem !important;
+        }
+        .bslib-value-box .value-box-title {
+          font-size: 0.85rem !important;
+        }
+
+        /* 5. Bandeau de notification simulation compact */
+        .banner-simulation-container {
+          padding: 8px 12px !important;
+          font-size: 0.80rem !important;
+          line-height: 1.35 !important;
+        }
+
+        /* 6. En-tete et barre de navigation */
+        .navbar-brand {
+          font-size: 1.05rem !important;
+          white-space: normal !important;
+          line-height: 1.25 !important;
+        }
+        .navbar-nav .nav-link {
+          padding: 8px 12px !important;
+          font-size: 0.92rem !important;
+        }
+        .navbar-nav .nav-link.active {
+          border-bottom: none !important;
+          border-left: 4px solid #228833 !important;
+          background-color: #F0FDF4 !important;
+        }
+
+        /* 7. Tableaux de donnees (DT) scrollables sans debordement */
+        .dataTables_wrapper {
+          width: 100% !important;
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+        table.dataTable {
+          font-size: 0.80rem !important;
+        }
+
+        /* 8. Menus deroulants et champs de filtre */
+        .selectize-input {
+          font-size: 0.88rem !important;
+          padding: 7px 10px !important;
+        }
+        .form-group {
+          margin-bottom: 8px !important;
+        }
+
+        /* 9. Images et graphiques */
+        .shiny-plot-output img {
+          max-width: 100% !important;
+          height: auto !important;
+        }
+      }
+
+      /* Adaptation pour tablettes (769px a 992px) */
+      @media (min-width: 769px) and (max-width: 992px) {
+        .bslib-grid, .grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 12px !important;
+        }
+        .bslib-grid > *, .grid > * {
+          grid-column: span 1 / span 1 !important;
+        }
+        .html-widget.ggiraph {
+          touch-action: pan-y !important;
+        }
+      }
     "))
     ),
     if (use_simulated_data) {
       tags$div(
+        class = "banner-simulation-container",
         style = "background-color: #FFFBEB; border-bottom: 2px solid #F59E0B; color: #92400E; padding: 10px 24px; font-size: 0.92rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;",
         tags$div(
           tags$strong("Mode démonstration sur données simulées — "),
@@ -2587,7 +2720,10 @@ server <- function(input, output, session) {
     } else {
       sorted_df <- filtered_ref %>% arrange(groupe, categorie_standard)
       new_choices <- split(sorted_df$categorie_standard, sorted_df$groupe)
-      flat_choices <- sorted_df$categorie_standard
+      if (input$tag_saison == "Toutes saisons" && !isTRUE(input$tag_panier)) {
+        new_choices <- c(list("Indice Territorial Global" = c("Indice des Prix Territoriaux (IPT)" = "Indice Français des Prix en Circuits Courts")), new_choices)
+      }
+      flat_choices <- c("Indice Français des Prix en Circuits Courts", sorted_df$categorie_standard)
     }
     
     current_sel <- isolate(input$map_prod)
@@ -2600,7 +2736,27 @@ server <- function(input, output, session) {
   
   # Fiche d'identité FoodOn du produit sélectionné
   output$foodon_badge_card <- renderUI({
-    req(input$map_prod, df_foodon_ref)
+    req(input$map_prod)
+    if (input$map_prod == "Indice Français des Prix en Circuits Courts") {
+      return(div(
+        style = "height: 100%; min-height: 175px; padding: 14px 16px; background: #FFFFFF; border: 1px solid #E2E8F0; border-left: 4px solid #6366F1; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;",
+        div(
+          div(
+            style = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;",
+            strong("Indice des Prix Territoriaux (IPT)", style = "font-size: 1.15em; color: #1E293B; font-family: 'Outfit', sans-serif;"),
+            span("Base 1.00", class = "badge bg-primary", style = "font-weight: 600; font-size: 0.82em;")
+          ),
+          p("Disparité spatiale pure des prix", style = "color: #64748B; margin: 0 0 6px 0; font-size: 0.88em;"),
+          div(
+            style = "margin-bottom: 8px;",
+            span("Modèle Linéaire Mixte", class = "badge bg-info text-dark", style = "margin-right: 4px; font-weight: 500; font-size: 0.78em;"),
+            span("Multi-produits", class = "badge bg-success", style = "font-weight: 500; font-size: 0.78em;")
+          )
+        ),
+        p("Synthèse territoriale multi-produits contrôlant l'effet panier, le bio, le format et la plateforme.", style = "font-size: 0.84em; color: #475569; margin: 0;")
+      ))
+    }
+    req(df_foodon_ref)
     prod_info <- df_foodon_ref %>% filter(categorie_standard == input$map_prod)
     if (nrow(prod_info) == 0) return(NULL)
     
@@ -2660,6 +2816,9 @@ server <- function(input, output, session) {
   # Titre dynamique de la carte selon le produit et son unité
   output$map_card_title <- renderUI({
     req(input$map_prod)
+    if (input$map_prod == "Indice Français des Prix en Circuits Courts") {
+      return(h4("Carte Géographique de l'Indice des Prix Territoriaux (IPT)", style = "margin:0; font-family:'Outfit';"))
+    }
     unit_str <- "kg"
     if (!is.null(df_foodon_ref)) {
       sub_ref <- df_foodon_ref %>% filter(categorie_standard == input$map_prod)

@@ -8,7 +8,7 @@ Démonstrateur autonome développé par Jules Bataller-Beltran dédié aux méth
 
 Une version interactive compilée en WebAssembly via **Shinylive** est déployée automatiquement par GitHub Actions :
 
-- Démonstrateur en ligne : `https://julesbataller.github.io/priscope-demo/` (ou l'URL de votre dépôt GitHub Pages)
+- Démonstrateur en ligne : `https://julesbataller.github.io/Priscope/`
 
 > Note sur le premier chargement : GitHub Pages étant un hébergeur statique sans serveur R, l'application s'exécute directement dans votre navigateur grâce à **WebR**. Le premier chargement télécharge le moteur R WebAssembly et les bibliothèques cartographiques `sf`, `ragg` et `ggiraph`.
 
