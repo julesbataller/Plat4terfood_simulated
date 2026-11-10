@@ -29,9 +29,10 @@ jobs:
         with:
           extra-packages: |
             any::shinylive
+            any::htmlwidgets
             local::.
 
-      - name: Export Shiny application to static WebAssembly site
+      - name: Export Shinylive app and generate static showcase
         shell: Rscript {0}
         run: |
           bundle_dir <- "shinylive_bundle"
@@ -65,7 +66,15 @@ jobs:
           www_files <- www_files[!(basename(www_files) %in% unused_png)]
           file.copy(www_files, file.path(bundle_dir, "data_simulees", "www"), overwrite = TRUE)
 
-          shinylive::export(appdir = bundle_dir, destdir = "_site")
+          # 1. Export Shinylive sous _site/app (accessible a la demande)
+          cat("=== Exportation Shinylive vers _site/app ===\n")
+          shinylive::export(appdir = bundle_dir, destdir = "_site/app")
+
+          # 2. Generation de la page d accueil vitrine ultra-rapide sous _site/index.html
+          cat("=== Generation de la page vitrine d accueil vers _site ===\n")
+          res <- system("Rscript scripts/generer_vitrine.R _site")
+          if (res != 0) stop("Erreur lors de la generation de la vitrine statique")
+
           file.create("_site/.nojekyll")
 
       - name: Deploy static site to gh-pages branch

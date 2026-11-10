@@ -6,11 +6,14 @@ Démonstrateur autonome développé par Jules Bataller-Beltran dédié aux méth
 
 ## Démo interactive en ligne via GitHub Pages et WebR
 
-Une version interactive compilée en WebAssembly via **Shinylive** est déployée automatiquement par GitHub Actions :
+Le projet dispose d'un double mode d'accès déployé automatiquement par GitHub Actions :
 
-- Démonstrateur en ligne : `https://julesbataller.github.io/Priscope/`
+- **Page vitrine instantanée (< 1 s)** : `https://julesbataller.github.io/Priscope/`
+  Synthèse ultra-rapide des résultats économétriques majeurs, carte spatiale interactive autonome de l'Indice de Prix Territorial (IPT), comparatifs Student-t et classements complets pré-calculés, sans aucun temps de chargement initial WebAssembly.
+- **Console interactive Shinylive intégrale** : `https://julesbataller.github.io/Priscope/app/`
+  Application Shiny complète exécutée directement dans le navigateur via **WebR** pour explorer dynamiquement les 61 produits alimentaires, ajuster les filtres et consulter l'intégralité des 8 modules thématiques.
 
-> Note sur le premier chargement : GitHub Pages étant un hébergeur statique sans serveur R, l'application s'exécute directement dans votre navigateur grâce à **WebR**. Le premier chargement télécharge le moteur R WebAssembly et les bibliothèques cartographiques `sf`, `ragg` et `ggiraph`.
+> Note sur la console WebR : GitHub Pages étant un hébergeur statique sans serveur R, la console s'exécute directement dans votre navigateur grâce à **WebR**. Le premier démarrage de la console télécharge le moteur R WebAssembly et les bibliothèques cartographiques `sf`, `ragg` et `ggiraph`.
 
 ## Avertissement sur les données et cadre d'utilisation
 
@@ -58,7 +61,8 @@ shiny::runApp("app.R")
 ## Structure principale du projet
 
 - `app.R` : interface utilisateur `bslib` et serveur Shiny complet à 8 onglets thématiques.
-- `.github/workflows/deploy-shinylive.yml` : compilation automatique en application statique WebAssembly Shinylive vers la branche `gh-pages`.
+- `.github/workflows/deploy-shinylive.yml` : déploiement GitHub Pages automatisant la génération de la vitrine statique d'accueil et la compilation Shinylive vers la branche `gh-pages`.
+- `scripts/generer_vitrine.R` : générateur de la page vitrine d'accueil ultra-rapide pré-calculée et de la carte vectorielle interactive autonome `ggiraph`.
 - `scripts/simuler_donnees_github.R` : générateur reproductible des données simulées et des graphiques économétriques associés.
 - `scripts/modele_mixte.R` : estimation du modèle linéaire mixte REML et diagnostics résiduels gaussiens vs Student-t.
 - `scripts/analyse_saisonnalite.R` : décomposition STL et modélisation SARIMA des séries mensuelles.
